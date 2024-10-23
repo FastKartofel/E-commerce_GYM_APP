@@ -1,8 +1,9 @@
 package com.ecommerce.backend.service;
 
+import com.ecommerce.backend.dto.UserProfileUpdateDto;
 import com.ecommerce.backend.entity.User;
-import com.ecommerce.backend.repository.UserRepository;
 import com.ecommerce.backend.enums.Role;
+import com.ecommerce.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,16 @@ public class UserService {
     public boolean authenticate(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
         return user.isPresent() && passwordEncoder.matches(password, user.get().getPassword());
+    }
+
+    public void updateUserProfile(String username, UserProfileUpdateDto profileUpdateDto) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setEmail(profileUpdateDto.getEmail());
+        user.setShippingAddress(profileUpdateDto.getShippingAddress());
+        user.setPaymentDetails(profileUpdateDto.getPaymentDetails());
+
+        userRepository.save(user);
     }
 }

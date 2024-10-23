@@ -1,7 +1,6 @@
 package com.ecommerce.backend.entity;
 
 import com.ecommerce.backend.enums.Role;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,6 +23,13 @@ public class User {
     @Column(nullable = false)
     private boolean active;
 
+    @Column(nullable = false)
+    private String email;
+
+    private String shippingAddress;
+
+    private String paymentDetails;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
@@ -32,5 +38,3 @@ public class User {
     @JsonIgnore
     private Cart cart;
 }
-
-

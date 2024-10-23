@@ -54,12 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
 
                         .requestMatchers("/api/products/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.GET, "/api/orders/all").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/orders/place").authenticated()
 
-                        .requestMatchers(HttpMethod.DELETE, "/api/cart/remove/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/update").hasAnyRole("USER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
