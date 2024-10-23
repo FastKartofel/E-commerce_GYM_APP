@@ -1,9 +1,12 @@
 package com.ecommerce.backend.service;
 
 import com.ecommerce.backend.dto.ProductDto;
+import com.ecommerce.backend.entity.CartItem;
 import com.ecommerce.backend.entity.Category;
 import com.ecommerce.backend.entity.Product;
+import com.ecommerce.backend.repository.CartItemRepository;
 import com.ecommerce.backend.repository.CategoryRepository;
+import com.ecommerce.backend.repository.OrderRepository;
 import com.ecommerce.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,12 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     private final CategoryRepository categoryRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
@@ -33,29 +42,32 @@ public class ProductService {
     }
 
     public Product addProduct(ProductDto productDto) {
-        // Find category by ID from the productDto
-        Optional<Category> categoryOptional = categoryRepository.findById(productDto.getCategoryId());
-
-        if (!categoryOptional.isPresent()) {
-            throw new IllegalArgumentException("Category not found with ID: " + productDto.getCategoryId());
+        if (productDto.getCategoryId() == null) {
+            throw new IllegalArgumentException("Category ID must not be null");
         }
 
-        // If the category exists, create the product entity
-        Category category = categoryOptional.get();
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + productDto.getCategoryId()));
+
         Product product = new Product();
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
         product.setStockQuantity(productDto.getStockQuantity());
-        product.setCategory(category); // Set the category for the product
+        product.setCategory(category);
 
-        // Save the product and return it
         return productRepository.save(product);
     }
 
-
     public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        List<CartItem> cartItems = cartItemRepository.findByProductId(product.getId());
+        cartItems.forEach(cartItemRepository::delete);
+
         productRepository.deleteById(id);
     }
+
 }
 

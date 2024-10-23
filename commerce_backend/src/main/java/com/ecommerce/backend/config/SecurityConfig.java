@@ -1,5 +1,6 @@
 package com.ecommerce.backend.config;
 
+import com.ecommerce.backend.security.CustomAuthenticationEntryPoint;
 import com.ecommerce.backend.security.JwtAuthenticationFilter;
 import com.ecommerce.backend.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,17 +47,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/cart/remove/**").authenticated()  // Ensure DELETE is accessible
+
+                        .requestMatchers("/api/products/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/orders/all").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/orders/place").authenticated()
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/cart/remove/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.authenticationProvider(authenticationProvider()).build();
+        return http.build();
     }
 
 
