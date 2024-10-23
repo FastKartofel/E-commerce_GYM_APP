@@ -30,10 +30,20 @@ public class UserController {
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }
 
-        @PutMapping("/update")
-        public ResponseEntity<String> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails,
-                                                        @RequestBody UserProfileUpdateDto profileUpdateDto) {
-            userService.updateUserProfile(userDetails.getUsername(), profileUpdateDto);
-            return ResponseEntity.ok("User profile updated successfully");
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        boolean isAuthenticated = userService.authenticate(user.getUsername(), user.getPassword());
+        if (isAuthenticated) {
+            return new ResponseEntity<>("Login successful", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails,
+                                                    @RequestBody UserProfileUpdateDto profileUpdateDto) {
+        userService.updateUserProfile(userDetails.getUsername(), profileUpdateDto);
+        return ResponseEntity.ok("User profile updated successfully");
+    }
 }
