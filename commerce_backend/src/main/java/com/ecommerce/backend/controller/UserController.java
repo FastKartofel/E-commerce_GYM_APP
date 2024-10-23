@@ -1,10 +1,13 @@
 package com.ecommerce.backend.controller;
 
+import com.ecommerce.backend.dto.UserProfileUpdateDto;
 import com.ecommerce.backend.entity.User;
 import com.ecommerce.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,13 +30,10 @@ public class UserController {
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        boolean isAuthenticated = userService.authenticate(user.getUsername(), user.getPassword());
-        if (isAuthenticated) {
-            return new ResponseEntity<>("Login successful", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        @PutMapping("/update")
+        public ResponseEntity<String> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails,
+                                                        @RequestBody UserProfileUpdateDto profileUpdateDto) {
+            userService.updateUserProfile(userDetails.getUsername(), profileUpdateDto);
+            return ResponseEntity.ok("User profile updated successfully");
         }
-    }
 }
