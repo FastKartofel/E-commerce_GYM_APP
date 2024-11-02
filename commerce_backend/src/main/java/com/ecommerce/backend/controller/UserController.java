@@ -30,6 +30,7 @@ public class UserController {
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }
 
+    /**we are using login in the AuthenticationController
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
         boolean isAuthenticated = userService.authenticate(user.getUsername(), user.getPassword());
@@ -39,11 +40,27 @@ public class UserController {
             return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
     }
+    */
 
     @PutMapping("/update")
     public ResponseEntity<String> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails,
                                                     @RequestBody UserProfileUpdateDto profileUpdateDto) {
         userService.updateUserProfile(userDetails.getUsername(), profileUpdateDto);
         return ResponseEntity.ok("User profile updated successfully");
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileUpdateDto> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserProfileUpdateDto profile = new UserProfileUpdateDto();
+        profile.setUsername(user.getUsername());
+        profile.setEmail(user.getEmail());
+        profile.setShippingAddress(user.getShippingAddress());
+        profile.setPaymentDetails(user.getPaymentDetails());
+        profile.setRole(user.getRole().name());
+
+        return ResponseEntity.ok(profile);
     }
 }

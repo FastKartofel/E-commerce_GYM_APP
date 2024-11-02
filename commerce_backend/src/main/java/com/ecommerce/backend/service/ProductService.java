@@ -21,6 +21,8 @@ public class ProductService {
 
     private final CategoryRepository categoryRepository;
 
+
+
     @Autowired
     private CartItemRepository cartItemRepository;
 
@@ -68,6 +70,8 @@ public class ProductService {
 
         productRepository.deleteById(id);
     }
+
+
 
 }
 
