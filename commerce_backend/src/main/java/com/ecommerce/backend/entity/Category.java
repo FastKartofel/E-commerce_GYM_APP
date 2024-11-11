@@ -1,15 +1,12 @@
 package com.ecommerce.backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.List;
 
 @Entity
 @Table(name = "categories")
 @Data
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "products"})
 public class Category {
 
     @Id
@@ -17,7 +14,8 @@ public class Category {
     private Long id;
 
     private String name;
+    private String description;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products;
 }

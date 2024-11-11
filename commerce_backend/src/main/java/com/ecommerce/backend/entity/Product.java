@@ -1,3 +1,4 @@
+// src/main/java/com/ecommerce/backend/entity/Product.java
 package com.ecommerce.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,4 +30,7 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "products"})
     private Category category;
+
+//    @Version
+//    private int version; // For Optimistic Locking
 }

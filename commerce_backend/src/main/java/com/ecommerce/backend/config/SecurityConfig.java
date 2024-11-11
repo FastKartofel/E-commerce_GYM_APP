@@ -17,7 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -32,14 +36,21 @@ public class SecurityConfig {
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    @Autowired
-    private CorsFilter corsFilter;
-
+    /**
+     * Password encoder bean using BCrypt.
+     *
+     * @return PasswordEncoder instance.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * DaoAuthenticationProvider bean setup.
+     *
+     * @return DaoAuthenticationProvider instance.
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -48,36 +59,93 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * CORS configuration to allow requests from the frontend.
+     *
+     * @return CorsConfigurationSource instance.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Frontend URL
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
+        configuration.setAllowedHeaders(List.of("*")); // Allow all headers
+        configuration.setAllowCredentials(true); // Allow credentials
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Apply to all endpoints
+        return source;
+    }
+
+    /**
+     * Security filter chain configuration.
+     *
+     * @param http HttpSecurity instance.
+     * @return SecurityFilterChain instance.
+     * @throws Exception in case of configuration errors.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // Disables CSRF
+                // Disable CSRF as JWT is used
+                .csrf(csrf -> csrf.disable())
+
+                // Handle unauthorized access
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
+
+                // Set session management to stateless
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // Configure CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Set authorization rules
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
 
-                        .requestMatchers("/api/products/**").hasRole("ADMIN")
+                        // Allow GET requests on /api/products/** to any authenticated user
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").authenticated()
+
+                        // Restrict POST and DELETE requests on /api/products/** to ADMIN role
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        // Admin-only access to all orders
                         .requestMatchers(HttpMethod.GET, "/api/orders/all").hasRole("ADMIN")
 
+                        // Authenticated users can place orders
                         .requestMatchers(HttpMethod.POST, "/api/orders/place").authenticated()
 
+                        // Users and admins can update user information
                         .requestMatchers(HttpMethod.PUT, "/api/users/update").hasAnyRole("USER", "ADMIN")
 
                         // Profile endpoint requires authentication
                         .requestMatchers("/api/users/profile").authenticated()
 
+                        // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(corsFilter, JwtAuthenticationFilter.class);
+                // Add JWT authentication filter before the UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // Set the authentication provider
+                .authenticationProvider(authenticationProvider());
 
         return http.build();
     }
 
+    /**
+     * AuthenticationManager bean setup.
+     *
+     * @param config AuthenticationConfiguration instance.
+     * @return AuthenticationManager instance.
+     * @throws Exception in case of configuration errors.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

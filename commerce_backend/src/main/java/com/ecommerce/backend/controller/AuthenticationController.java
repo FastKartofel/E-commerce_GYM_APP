@@ -12,6 +12,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
@@ -32,8 +35,16 @@ public class AuthenticationController {
         );
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+        // Extract roles from UserDetails
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .collect(Collectors.toList());
+
+        // Generate JWT token with roles
+        String jwt = jwtUtil.generateToken(userDetails.getUsername(), roles);
 
         return ResponseEntity.ok(jwt);
     }
+
 }

@@ -31,16 +31,16 @@ public class UserController {
     }
 
     /**we are using login in the AuthenticationController
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        boolean isAuthenticated = userService.authenticate(user.getUsername(), user.getPassword());
-        if (isAuthenticated) {
-            return new ResponseEntity<>("Login successful", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
-        }
-    }
-    */
+     @PostMapping("/login")
+     public ResponseEntity<String> loginUser(@RequestBody User user) {
+     boolean isAuthenticated = userService.authenticate(user.getUsername(), user.getPassword());
+     if (isAuthenticated) {
+     return new ResponseEntity<>("Login successful", HttpStatus.OK);
+     } else {
+     return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+     }
+     }
+     */
 
     @PutMapping("/update")
     public ResponseEntity<String> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails,
@@ -55,11 +55,11 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserProfileUpdateDto profile = new UserProfileUpdateDto();
-        profile.setUsername(user.getUsername());
+        //profile.setUsername(user.getUsername());
         profile.setEmail(user.getEmail());
         profile.setShippingAddress(user.getShippingAddress());
         profile.setPaymentDetails(user.getPaymentDetails());
-        profile.setRole(user.getRole().name());
+        //profile.setRole(user.getRole().name());
 
         return ResponseEntity.ok(profile);
     }

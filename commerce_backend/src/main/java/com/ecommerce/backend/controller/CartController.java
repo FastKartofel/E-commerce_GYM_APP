@@ -38,5 +38,4 @@ public class CartController {
         return ResponseEntity.ok("Item removed from cart");
     }
 
-
 }

@@ -18,10 +18,7 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
-
     private final CategoryRepository categoryRepository;
-
-
 
     @Autowired
     private CartItemRepository cartItemRepository;
@@ -40,7 +37,8 @@ public class ProductService {
     }
 
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     public Product addProduct(ProductDto productDto) {
@@ -71,7 +69,14 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    // If using categoryName (case-insensitive)
+    public List<Product> findByCategoryNameIgnoreCase(String categoryName) {
+        return productRepository.findByCategoryNameIgnoreCase(categoryName);
+    }
 
-
+    // **New Method for Filtering by Category ID**
+    public List<Product> findByCategoryId(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
 }
 
