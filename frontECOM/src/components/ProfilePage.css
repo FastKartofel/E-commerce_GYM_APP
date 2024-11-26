@@ -1,0 +1,107 @@
+/* src/components/ProfilePage.css */
+
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background-color: #1c1c1c; /* Dark background to match the theme */
+    min-height: 80vh;
+}
+
+.profile-card {
+    background-color: #2c2c2c; /* Slightly lighter dark background for the card */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 600px;
+    color: #fff;
+}
+
+.profile-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #28a745; /* Green accent to match the theme */
+}
+
+.profile-details p {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.edit-button,
+.save-button,
+.cancel-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+}
+
+.edit-button {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.edit-button:hover {
+    background-color: #218838;
+}
+
+.save-button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.save-button:hover {
+    background-color: #0069d9;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.cancel-button:hover {
+    background-color: #c82333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #3c3c3c;
+    color: #fff;
+}
+
+.form-group input::placeholder {
+    color: #bbb;
+}
+
+.success-message {
+    color: #28a745;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    margin-top: 10px;
+}
