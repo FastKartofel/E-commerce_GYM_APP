@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ECOM
-    username: postgres
-    password: Molly123#
+    url: jdbc:postgresql://ecommerce-flexible-server.postgres.database.azure.com:5432/ecommerce_database?sslmode=require
+    username: s24706
+    password: Czerwonysmok121#
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -10,13 +10,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+
 
 server:
   port: 8080
   error:
     whitelabel:
       enabled: false
+
 jwt:
   secret: MjYxYjM4YmEtODdmOC00Mjc2LTgxN2UtMmEyOGEyNTM0Mjg1ZGZjZjNkMWM0Mzc5
   expiration: 86400000
