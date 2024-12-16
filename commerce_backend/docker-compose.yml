@@ -8,14 +8,14 @@ services:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://ecommerce-flexible-server.postgres.database.azure.com:5432/ecommerce_database?sslmode=require
-      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_USERNAME: s24706
       SPRING_DATASOURCE_PASSWORD: Czerwonysmok121#
     depends_on:
       - db
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: s24706
       POSTGRES_PASSWORD: Czerwonysmok121#
       POSTGRES_DB: ecommerce_database
     ports:
