@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ecommerce-flexible-server.postgres.database.azure.com:5432/ecommerce_database?sslmode=require
+    url: jdbc:postgresql://ecommerce-flexible-server.postgres.database.azure.com:5432/ecommerce_database
     username: s24706
     password: Czerwonysmok121#
     driver-class-name: org.postgresql.Driver
