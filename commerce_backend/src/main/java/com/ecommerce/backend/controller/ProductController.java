@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     /**
-     * Fetch products by categoryId.
+     * Fetch PRODUCTS by categoryId.
      *
      * @param categoryId Category ID to filter products.
      * @return List of products in the specified category.
