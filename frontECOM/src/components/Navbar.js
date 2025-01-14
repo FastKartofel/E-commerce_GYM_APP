@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -23,6 +22,8 @@ const Navbar = () => {
                 {isAuthenticated ? (
                     <>
                         <Link to="/cart" style={styles.link}>Cart</Link>
+                        <Link to="/orders/current" style={styles.link}>Current Orders</Link>
+                        <Link to="/orders/history" style={styles.link}>Order History</Link>
                         <Link to="/profile" style={styles.link}>Profile</Link>
                         <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
                     </>

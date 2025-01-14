@@ -1,4 +1,3 @@
-// src/components/ProductDetailsPage.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,7 +9,23 @@ const ProductDetailsPage = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    const [reviews, setReviews] = useState([]); // Reviews state
+    const [reviewContent, setReviewContent] = useState(''); // Review content state
+    const [reviewRating, setReviewRating] = useState(5); // Review rating state
+    const [username, setUsername] = useState(''); // Logged-in user's username
+
+    // Fetch reviews for the product
+    const fetchReviews = async () => {
+        try {
+            const response = await axios.get(`/api/reviews/product/${id}`);
+            setReviews(response.data); // Fetch ReviewResponseDTO objects
+        } catch (err) {
+            console.error('Failed to load reviews', err);
+        }
+    };
+
     useEffect(() => {
+        // Fetch product details
         const fetchProductDetails = async () => {
             try {
                 const response = await axios.get(`/api/products/${id}`);
@@ -20,7 +35,20 @@ const ProductDetailsPage = () => {
                 console.error(err);
             }
         };
+
+        // Fetch the logged-in user's username
+        const fetchUsername = async () => {
+            try {
+                const response = await axios.get('/api/users/me'); // Assumes a backend endpoint that returns the logged-in user's details
+                setUsername(response.data.username);
+            } catch (err) {
+                console.error('Failed to fetch user details', err);
+            }
+        };
+
         fetchProductDetails();
+        fetchReviews();
+        fetchUsername();
     }, [id]);
 
     const handleAddToCart = async () => {
@@ -31,6 +59,23 @@ const ProductDetailsPage = () => {
         } catch (err) {
             setError('Failed to add to cart.');
             console.error(err);
+        }
+    };
+
+    const handleAddReview = async () => {
+        try {
+            const newReview = {
+                content: reviewContent,
+                rating: reviewRating,
+                productId: product.id, // Use productId directly
+            };
+            await axios.post('/api/reviews/add', newReview);
+            setReviewContent('');
+            setReviewRating(5);
+            fetchReviews(); // Refresh the reviews list after submitting
+        } catch (err) {
+            console.error('Failed to add review', err);
+            alert('Failed to add review. Please try again.');
         }
     };
 
@@ -55,7 +100,50 @@ const ProductDetailsPage = () => {
                             style={styles.input}
                         />
                     </div>
-                    <button onClick={handleAddToCart} style={styles.button}>Add to Cart</button>
+                    <button onClick={handleAddToCart} style={styles.button}>
+                        Add to Cart
+                    </button>
+
+                    {/* Reviews Section */}
+                    <div>
+                        <h3>Reviews</h3>
+                        {reviews.length > 0 ? (
+                            <ul>
+                                {reviews.map((review, index) => (
+                                    <li key={index}>
+                                        <p>
+                                            <strong>{review.username}:</strong> {/* Use review.username from ReviewResponseDTO */}
+                                            {review.content} ({review.rating}/5) - {new Date(review.createdAt).toLocaleDateString()}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No reviews yet. Be the first to review!</p>
+                        )}
+                        <div>
+                            <textarea
+                                value={reviewContent}
+                                onChange={(e) => setReviewContent(e.target.value)}
+                                placeholder="Write your review"
+                                style={styles.textarea}
+                            />
+                            <select
+                                value={reviewRating}
+                                onChange={(e) => setReviewRating(parseInt(e.target.value))}
+                                style={styles.select}
+                            >
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Good</option>
+                                <option value="3">3 - Average</option>
+                                <option value="2">2 - Poor</option>
+                                <option value="1">1 - Terrible</option>
+                            </select>
+                            <button onClick={handleAddReview} style={styles.button}>
+                                Submit Review
+                            </button>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <p>Loading product...</p>
@@ -85,10 +173,25 @@ const styles = {
         padding: '5px',
         width: '60px',
     },
+    select: {
+        marginBottom: '10px',
+        padding: '5px',
+        width: '100%',
+    },
     button: {
         padding: '10px 20px',
         fontSize: '16px',
         cursor: 'pointer',
+        margin: '10px 0',
+    },
+    textarea: {
+        display: 'block',
+        width: '100%',
+        marginBottom: '10px',
+        padding: '10px',
+        fontSize: '14px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
     },
 };
 

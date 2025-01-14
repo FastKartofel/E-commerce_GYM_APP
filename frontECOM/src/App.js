@@ -10,7 +10,9 @@ import Navbar from './components/Navbar';
 import ProductDetailsPage from './components/ProductDetailsPage';
 import ProductsPage from './components/ProductsPage';
 import ProfilePage from './components/ProfilePage';
-import CartPage from './components/CartPage'; // Assuming you have this component
+import CartPage from './components/CartPage';
+import CurrentOrdersPage from './components/CurrentOrdersPage'; // Import CurrentOrdersPage
+import OrderHistoryPage from './components/OrderHistoryPage'; // Import OrderHistoryPage
 import NotFoundPage from './components/NotFoundPage'; // For 404
 
 function App() {
@@ -58,6 +60,22 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <CartPage />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/orders/current"
+                        element={
+                            <PrivateRoute>
+                                <CurrentOrdersPage />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/orders/history"
+                        element={
+                            <PrivateRoute>
+                                <OrderHistoryPage />
                             </PrivateRoute>
                         }
                     />
