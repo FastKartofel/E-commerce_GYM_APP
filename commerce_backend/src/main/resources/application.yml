@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ecommerce-flexible-server.postgres.database.azure.com:5432/ecommerce_database
-    username: s24706
-    password: Czerwonysmok121#
+    url: jdbc:postgresql://localhost:5432/ECOM
+    username: postgres
+    password: Molly123#
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -10,7 +10,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+    show-sql: true
 
 server:
   port: 8080
@@ -21,3 +21,6 @@ server:
 jwt:
   secret: MjYxYjM4YmEtODdmOC00Mjc2LTgxN2UtMmEyOGEyNTM0Mjg1ZGZjZjNkMWM0Mzc5
   expiration: 86400000
+
+openai:
+  api-key: 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 # Add your API key here
