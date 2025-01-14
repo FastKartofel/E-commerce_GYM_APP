@@ -44,4 +44,25 @@ public class OrderController {
 
         return ResponseEntity.ok(order);
     }
+
+    @GetMapping("/current")
+    public ResponseEntity<List<Order>> getCurrentOrders(Principal principal) throws UsernameNotFoundException {
+        User user = userService.findByUsername(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + principal.getName()));
+
+        List<Order> currentOrders = orderService.getCurrentOrders(user);
+        return ResponseEntity.ok(currentOrders);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<Order>> getOrderHistory(Principal principal) throws UsernameNotFoundException {
+        User user = userService.findByUsername(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + principal.getName()));
+
+        List<Order> orderHistory = orderService.getOrderHistory(user);
+        return ResponseEntity.ok(orderHistory);
+    }
+
+
+
 }

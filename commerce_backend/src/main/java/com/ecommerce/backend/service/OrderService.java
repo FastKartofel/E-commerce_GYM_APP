@@ -1,4 +1,3 @@
-// OrderService.java
 package com.ecommerce.backend.service;
 
 import com.ecommerce.backend.dto.CartItemDto;
@@ -6,6 +5,7 @@ import com.ecommerce.backend.entity.Order;
 import com.ecommerce.backend.entity.OrderItem;
 import com.ecommerce.backend.entity.Product;
 import com.ecommerce.backend.entity.User;
+import com.ecommerce.backend.enums.OrderStatus;
 import com.ecommerce.backend.exception.InsufficientStockException;
 import com.ecommerce.backend.exception.ProductNotFoundException;
 import com.ecommerce.backend.repository.OrderRepository;
@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,65 +37,70 @@ public class OrderService {
     public Order placeOrder(User user, List<CartItemDto> cartItems) throws InsufficientStockException, ProductNotFoundException {
         logger.info("Placing order for user: {}", user.getUsername());
 
-        try {
-            Order order = new Order();
-            order.setUser(user);
-            order.setOrderDate(LocalDateTime.now());
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.PENDING); // Set initial status
 
-            double totalAmount = 0.0;
-            List<OrderItem> orderItems = new ArrayList<>();
+        double totalAmount = 0.0;
+        List<OrderItem> orderItems = new ArrayList<>();
 
-            for (CartItemDto cartItemDto : cartItems) {
-                Long productId = cartItemDto.getProductId();
-                Integer quantity = cartItemDto.getQuantity();
+        for (CartItemDto cartItemDto : cartItems) {
+            Long productId = cartItemDto.getProductId();
+            Integer quantity = cartItemDto.getQuantity();
 
-                logger.debug("Processing CartItem - Product ID: {}, Quantity: {}", productId, quantity);
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ProductNotFoundException("Product not found: " + productId));
 
-                if (productId == null) {
-                    logger.error("Product ID is null in CartItem.");
-                    throw new ProductNotFoundException("Product ID is null.");
-                }
-
-                Product product = productRepository.findById(productId)
-                        .orElseThrow(() -> {
-                            logger.error("Product not found: {}", productId);
-                            return new ProductNotFoundException("Product not found: " + productId);
-                        });
-
-                if (product.getStockQuantity() < quantity) {
-                    logger.warn("Insufficient stock for product: {}. Requested: {}, Available: {}",
-                            product.getName(), quantity, product.getStockQuantity());
-                    throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
-                }
-
-                // Decrement stock
-                product.setStockQuantity(product.getStockQuantity() - quantity);
-                productRepository.save(product); // This will increment the version
-                logger.debug("Decremented stock for product: {}. New stock: {}", product.getName(), product.getStockQuantity());
-
-                // Create OrderItem
-                OrderItem orderItem = new OrderItem();
-                orderItem.setOrder(order);
-                orderItem.setProduct(product);
-                orderItem.setQuantity(quantity);
-                orderItem.setPrice(product.getPrice());
-
-                orderItems.add(orderItem);
-
-                // Calculate total
-                totalAmount += product.getPrice() * quantity;
+            if (product.getStockQuantity() < quantity) {
+                throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
 
-            order.setTotalAmount(totalAmount);
-            order.setOrderItems(orderItems);
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+            productRepository.save(product);
 
-            Order savedOrder = orderRepository.save(order);
-            logger.info("Order placed successfully. Order ID: {}", savedOrder.getId());
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(quantity);
+            orderItem.setPrice(product.getPrice());
 
-            return savedOrder;
-        } catch (OptimisticLockingFailureException e) {
-            logger.error("Optimistic locking failed while placing order for user: {}", user.getUsername(), e);
-            throw new InsufficientStockException("Failed to place order due to stock changes. Please try again.");
+            orderItems.add(orderItem);
+            totalAmount += product.getPrice() * quantity;
         }
+
+        order.setTotalAmount(totalAmount);
+        order.setOrderItems(orderItems);
+
+        return orderRepository.save(order);
+    }
+
+    // Simulate order processing
+    public void processOrders() {
+        List<Order> pendingOrders = orderRepository.findByStatus(OrderStatus.PENDING);
+        pendingOrders.forEach(order -> {
+            if (order.getOrderDate().plusDays(3).isBefore(LocalDateTime.now())) {
+                order.setStatus(OrderStatus.COMPLETED);
+                orderRepository.save(order);
+            }
+        });
+    }
+
+    // Fetch current (PENDING) orders for the user
+    public List<Order> getCurrentOrders(User user) {
+        logger.info("Fetching current orders for user: {}", user.getUsername());
+        return orderRepository.findByUserAndStatus(user, OrderStatus.PENDING);
+    }
+
+    // Fetch completed orders (history) for the user
+    public List<Order> getOrderHistory(User user) {
+        logger.info("Fetching order history for user: {}", user.getUsername());
+        return orderRepository.findByUserAndStatus(user, OrderStatus.COMPLETED);
+    }
+
+    // Run the processOrders method daily
+    @Scheduled(cron = "0 0 0 * * ?") // Executes at midnight every day
+    public void scheduleOrderProcessing() {
+        processOrders();
     }
 }
