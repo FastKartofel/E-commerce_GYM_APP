@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+    /////
 
     private final ProductService productService;
     private final ProductRepository productRepository;
@@ -48,7 +49,7 @@ public class ProductController {
     }
 
     /**
-     * Fetch products by categoryId.
+     * Fetch PRODUCTS by categoryId.
      *
      * @param categoryId Category ID to filter products.
      * @return List of products in the specified category.
