@@ -1,9 +1,10 @@
-// src/main/java/com/ecommerce/backend/entity/Product.java
 package com.ecommerce.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -31,6 +32,6 @@ public class Product {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "products"})
     private Category category;
 
-//    @Version
-//    private int version; // For Optimistic Locking
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
 }
