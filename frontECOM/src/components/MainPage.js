@@ -1,13 +1,10 @@
-// src/components/MainPage.js
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import './MainPage.css';
 
-// Importing background images
-import creatineBg from '../assets/backgrounds/creatine-bg.jpg';
-import wheyBg from '../assets/backgrounds/whey-bg.jpg';
-import preworkoutBg from '../assets/backgrounds/pre-workout-bg.jpg';
+// Import the ProductChatbot component
+import ProductChatbot from './ProductChatbot';
 
 const MainPage = () => {
     const [searchParams] = useSearchParams();
@@ -23,7 +20,6 @@ const MainPage = () => {
         '1': 'bg-whey',          // Whey Protein
         '2': 'bg-creatine',      // Creatine
         '3': 'bg-pre-workout',   // Pre-Workout
-        // Add more mappings as needed
     };
 
     // Function to get background class based on categoryId
@@ -37,7 +33,6 @@ const MainPage = () => {
             '1': 'Whey Protein',
             '2': 'Creatine',
             '3': 'Pre-Workout',
-            // Add more mappings as needed
         };
         return categoryMap[id] || 'Category';
     };
@@ -93,7 +88,11 @@ const MainPage = () => {
                         <Link to="/main?categoryId=3" className="category-card">
                             Pre-Workout
                         </Link>
-                        {/* Add more categories as needed */}
+                    </div>
+                    {/* Chatbot placed on the main page */}
+                    <div className="chatbot-section">
+                        <h3>Need Help Choosing? Ask our Chatbot!</h3>
+                        <ProductChatbot />
                     </div>
                 </>
             ) : (
