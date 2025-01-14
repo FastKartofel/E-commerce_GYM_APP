@@ -1,6 +1,8 @@
 // src/main/java/com/ecommerce/backend/entity/Order.java
 package com.ecommerce.backend.entity;
 
+import com.ecommerce.backend.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,12 +22,20 @@ public class Order {
 
     private Double totalAmount;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // Assuming you have a User entity
+    private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<OrderItem> orderItems;
+
     @Version
-    private int version; // Use primitive type
+    private Integer version; // Ensure @Version is applied to handle optimistic locking
 }
+
+
+
