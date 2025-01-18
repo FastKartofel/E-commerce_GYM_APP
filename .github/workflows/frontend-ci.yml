@@ -1,0 +1,33 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Docker Build and Push
+        env:
+          AZURE_CR_USERNAME: ${{ secrets.AZURE_CR_USERNAME }}
+          AZURE_CR_PASSWORD: ${{ secrets.AZURE_CR_PASSWORD }}
+        run: |
+          docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
+          docker build -t commerceregistry.azurecr.io/ecommerce-frontend:latest .
+          docker push commerceregistry.azurecr.io/ecommerce-frontend:latest
