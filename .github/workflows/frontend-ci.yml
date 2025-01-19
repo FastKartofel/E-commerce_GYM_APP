@@ -10,29 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code from GitHub
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Install Node.js
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '20'  # Specify Node.js version
 
+      # Step 3: Install dependencies and build the frontend
       - name: Install dependencies and build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider  # Fix OpenSSL errors
         run: |
-          cd frontECOM  # Ensure this is the correct directory
+          cd frontECOM  # Navigate to frontend directory
           npm install
-          CI=false npm run build  # Add CI=false to avoid treating warnings as errors
+          CI=false npm run build  # Ignore warnings breaking the build
 
+      # Step 4: Dockerize the frontend and push to Azure Container Registry
       - name: Docker Build and Push
         env:
           AZURE_CR_USERNAME: ${{ secrets.AZURE_CR_USERNAME }}
           AZURE_CR_PASSWORD: ${{ secrets.AZURE_CR_PASSWORD }}
         run: |
-          cd frontECOM  # Ensure Dockerfile is in the same directory
+          cd frontECOM  # Navigate to frontend directory containing Dockerfile
           docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
           docker build -t commerceregistry.azurecr.io/ecommerce-frontend:latest .
           docker push commerceregistry.azurecr.io/ecommerce-frontend:latest
-
-
 
