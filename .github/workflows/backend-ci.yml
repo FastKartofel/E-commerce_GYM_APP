@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin'  # Add this line
 
       - name: Build with Maven
         run: mvn clean package
@@ -29,3 +30,4 @@ jobs:
           docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
           docker build -t commerceregistry.azurecr.io/ecommerce-backend:latest .
           docker push commerceregistry.azurecr.io/ecommerce-backend:latest
+

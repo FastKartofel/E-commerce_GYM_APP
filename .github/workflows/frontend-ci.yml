@@ -20,6 +20,7 @@ jobs:
 
       - name: Install dependencies and build
         run: |
+          cd frontECOM  # Change to the correct directory containing package.json
           npm install
           npm run build
 
@@ -31,3 +32,4 @@ jobs:
           docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
           docker build -t commerceregistry.azurecr.io/ecommerce-frontend:latest .
           docker push commerceregistry.azurecr.io/ecommerce-frontend:latest
+
