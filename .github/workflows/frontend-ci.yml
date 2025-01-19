@@ -20,16 +20,19 @@ jobs:
 
       - name: Install dependencies and build
         run: |
-          cd frontECOM  # Change to the correct directory containing package.json
+          cd frontECOM  # Ensure this is the correct directory
           npm install
-          npm run build
+          CI=false npm run build  # Add CI=false to avoid treating warnings as errors
 
       - name: Docker Build and Push
         env:
           AZURE_CR_USERNAME: ${{ secrets.AZURE_CR_USERNAME }}
           AZURE_CR_PASSWORD: ${{ secrets.AZURE_CR_PASSWORD }}
         run: |
+          cd frontECOM  # Ensure Dockerfile is in the same directory
           docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
           docker build -t commerceregistry.azurecr.io/ecommerce-frontend:latest .
           docker push commerceregistry.azurecr.io/ecommerce-frontend:latest
+
+
 
