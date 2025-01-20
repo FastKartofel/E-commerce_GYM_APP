@@ -20,16 +20,24 @@ jobs:
         with:
           node-version: '20'  # Specify Node.js version
 
-      # Step 3: Install dependencies and build the frontend
-      - name: Install dependencies and build
+      # Step 3: Install dependencies and run tests
+      - name: Install dependencies and run tests
         env:
           NODE_OPTIONS: --openssl-legacy-provider  # Fix OpenSSL errors
         run: |
           cd frontECOM  # Navigate to frontend directory
           npm install
+          npm test -- --watchAll=false  # Run tests in non-interactive mode
+
+      # Step 4: Build the frontend
+      - name: Build the frontend
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider  # Fix OpenSSL errors
+        run: |
+          cd frontECOM  # Navigate to frontend directory
           CI=false npm run build  # Ignore warnings breaking the build
 
-      # Step 4: Dockerize the frontend and push to Azure Container Registry
+      # Step 5: Dockerize the frontend and push to Azure Container Registry
       - name: Docker Build and Push
         env:
           AZURE_CR_USERNAME: ${{ secrets.AZURE_CR_USERNAME }}
