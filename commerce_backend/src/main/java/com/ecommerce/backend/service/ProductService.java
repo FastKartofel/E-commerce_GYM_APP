@@ -71,14 +71,12 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        List<CartItem> cartItems = cartItemRepository.findByProductId(product.getId());
-        cartItems.forEach(cartItemRepository::delete);
-
-        productRepository.deleteById(id);
+    public void deleteProduct(Long productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isEmpty()) {
+            throw new RuntimeException("Product not found with ID: " + productId);
+        }
+        productRepository.deleteById(productId);
     }
 
     // If using categoryName (case-insensitive)
