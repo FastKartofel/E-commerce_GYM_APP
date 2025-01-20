@@ -19,10 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
+      - name: Build and Test with Maven
         run: |
           cd commerce_backend  # Change to the correct directory
-          mvn clean package
+          mvn clean test       # Run unit tests
+          mvn clean package    # Package the application
 
       - name: Docker Build and Push
         env:
