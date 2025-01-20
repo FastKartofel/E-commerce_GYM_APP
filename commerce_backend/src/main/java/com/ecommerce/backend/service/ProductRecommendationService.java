@@ -3,7 +3,6 @@ package com.ecommerce.backend.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,8 +13,13 @@ public class ProductRecommendationService {
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     private final String apiKey;
 
-    public ProductRecommendationService(@Value("${openai.api-key}") String apiKey) {
-        this.apiKey = apiKey;
+    public ProductRecommendationService() {
+        // Fetch the OpenAI API key from environment variables
+        this.apiKey = System.getenv("OPENAI_API_KEY");
+
+        if (this.apiKey == null || this.apiKey.isBlank()) {
+            throw new IllegalStateException("OpenAI API key is not set in environment variables.");
+        }
     }
 
     public String getRecommendations(String userPrompt) {
@@ -66,4 +70,3 @@ public class ProductRecommendationService {
         }
     }
 }
-

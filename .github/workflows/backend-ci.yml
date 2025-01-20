@@ -20,17 +20,19 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and Test with Maven
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          cd commerce_backend  # Change to the correct directory
-          mvn clean test       # Run unit tests
-          mvn clean package    # Package the application
+          cd commerce_backend
+          mvn clean test  # Run unit tests
+          mvn clean package  # Package the application
 
       - name: Docker Build and Push
         env:
           AZURE_CR_USERNAME: ${{ secrets.AZURE_CR_USERNAME }}
           AZURE_CR_PASSWORD: ${{ secrets.AZURE_CR_PASSWORD }}
         run: |
-          cd commerce_backend  # Ensure Dockerfile is in the same directory
+          cd commerce_backend
           docker login commerceregistry.azurecr.io -u $AZURE_CR_USERNAME -p $AZURE_CR_PASSWORD
           docker build -t commerceregistry.azurecr.io/ecommerce-backend:latest .
           docker push commerceregistry.azurecr.io/ecommerce-backend:latest
