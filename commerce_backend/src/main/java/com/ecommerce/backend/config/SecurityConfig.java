@@ -127,6 +127,8 @@ public class SecurityConfig {
                         // Profile endpoint requires authentication
                         .requestMatchers("/api/users/profile").authenticated()
 
+                        .requestMatchers(HttpMethod.POST, "/api/recommendations").authenticated()
+
                         // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
