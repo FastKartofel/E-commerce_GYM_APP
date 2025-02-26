@@ -12,3 +12,6 @@ Allow Users to Update Profile Details [23.10.2024]
 - Ensured profile updates persist in the database across sessions.
 - Secured the update process by requiring authentication for user profile updates.
 - Added validation and handling for authenticated requests during profile updates.
+
+
+Allow Users to Update Profile Details [27.02.2025]
