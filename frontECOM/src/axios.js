@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/', // Update if your backend runs elsewhere
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'ecommerce-backend-app.azurewebsites.net', // Update if your backend runs elsewhere
     headers: {
         'Content-Type': 'application/json',
     },
