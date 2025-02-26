@@ -7,7 +7,7 @@ import './index.css';
 import ErrorBoundary from './components/ErrorBoundary'; // If implemented
 
 // Axios Configuration
-axios.defaults.baseURL = 'ecommerce-backend-app.azurewebsites.net'; // Backend URL
+axios.defaults.baseURL = 'https://ecommerce-backend-app.azurewebsites.net'; // Backend URL
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 // Add a request interceptor to include JWT token in headers
