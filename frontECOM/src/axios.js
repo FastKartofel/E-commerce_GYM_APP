@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: 'https://ecommerce-backend-app.azurewebsites.net', // Update if your backend runs elsewhere
+    baseURL: 'https://ecommerce-backend-app.azurewebsites.net', // Directly setting the backend URL
     headers: {
         'Content-Type': 'application/json',
     },

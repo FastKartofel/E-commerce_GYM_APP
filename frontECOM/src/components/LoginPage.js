@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axiosInstance from '../axios';
 import { FaDumbbell } from 'react-icons/fa'; // Gym-related icon
 
 const LoginPage = () => {
@@ -18,7 +18,7 @@ const LoginPage = () => {
         setLoading(true);
         try {
             console.log('Attempting to log in with:', { username, password });
-            const response = await axios.post('/api/auth/login', { username, password }, { responseType: 'text' });
+            const response = await axiosInstance.post('/api/auth/login', { username, password }, { responseType: 'text' });
             const token = response.data.trim();
             console.log('Received token:', token);
 
